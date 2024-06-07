@@ -1,8 +1,7 @@
 #!/bin/bash
+
 dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
 biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
-########################}
-
 
 clear
 red='\e[1;31m'
@@ -14,7 +13,26 @@ echo "Trojan"
 echo "Progress..."
 sleep 3
 
-domain=$(cat /root/domain)
+# Domain selection
+echo -e "${yell}Choose domain option:${NC}"
+echo "1. Automatic (Let script handle)"
+echo "2. Manual (Input your domain)"
+read -rp "Select an option [1-2]: " domain_option
+
+if [[ $domain_option -eq 1 ]]; then
+  domain=$(curl -s ifconfig.me)
+  echo -e "[ ${green}INFO${NC} ] Using automatic domain: $domain"
+elif [[ $domain_option -eq 2 ]]; then
+  read -rp "Enter your domain: " domain
+  echo -e "[ ${green}INFO${NC} ] Using manual domain: $domain"
+else
+  echo -e "[ ${red}ERROR${NC} ] Invalid option selected"
+  exit 1
+fi
+
+# Automatic UUID generation
+uuid=$(cat /proc/sys/kernel/random/uuid)
+
 sleep 1
 mkdir -p /etc/xray 
 echo -e "[ ${green}INFO${NC} ] Checking... "
@@ -44,7 +62,6 @@ ntpdate pool.ntp.org
 apt -y install chrony
 apt install zip -y
 apt install curl pwgen openssl netcat cron -y
-
 
 # install xray
 sleep 1
@@ -350,7 +367,7 @@ WantedBy=multi-user.target
 EOF
 cat > /etc/systemd/system/runn.service <<EOF
 [Unit]
-Description=Mampus-Anjeng
+Description=AtaLioMego
 After=network.target
 
 [Service]
